@@ -1,5 +1,13 @@
+import { error } from "@sveltejs/kit";
+
 export async function GET({ url }) {
   const targetUrl = url.searchParams.get("url");
+
+  try {
+    new URL(targetUrl);
+  } catch (err: any) {
+    error(err?.message || "URL invalid");
+  }
 
   if (!targetUrl) {
     return new Response("Missing ?url= parameter", { status: 400 });
