@@ -1,14 +1,19 @@
 <script lang="ts">
   import "../app.css";
+  // @ts-ignore
+  import { pwaInfo } from "virtual:pwa-info";
   import favicon from "$lib/assets/favicon.svg";
   import { ModeWatcher } from "mode-watcher";
   import ExternalLink from "@lucide/svelte/icons/external-link";
 
   let { children } = $props();
+
+  let webManifestLink = $derived<string>(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 </script>
 
 <svelte:head>
   <link rel="icon" href={favicon} />
+  {@html $state.snapshot(webManifestLink)}
 </svelte:head>
 
 <div class="flex h-screen w-full flex-col gap-4 p-3 sm:p-4">
