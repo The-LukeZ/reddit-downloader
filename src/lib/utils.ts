@@ -39,3 +39,15 @@ export function isShareUrl(url: string) {
   const shareRegex = /^https?:\/\/(www\.)?reddit\.com\/r\/[^/]+\/s\/[^/]+/;
   return shareRegex.test(url);
 }
+
+// Remove all query parameters and fragments from a URL
+export function sanitizeUrl(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    parsedUrl.search = "";
+    parsedUrl.hash = "";
+    return parsedUrl.toString();
+  } catch {
+    return url;
+  }
+}
