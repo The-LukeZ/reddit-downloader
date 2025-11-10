@@ -1,4 +1,3 @@
-import { handleShare, isShareUrl } from "$lib/utils";
 import { error } from "@sveltejs/kit";
 
 export async function GET({ url }) {
@@ -15,18 +14,7 @@ export async function GET({ url }) {
   }
 
   try {
-    // Check if its a reddit share url (because mobile) and handle accordingly
-    let finalUrl = targetUrl;
-    if (isShareUrl(targetUrl)) {
-      const realTarget = await handleShare(targetUrl);
-      if (realTarget) {
-        finalUrl = realTarget;
-      } else {
-        error(502, "Failed to resolve share URL");
-      }
-    }
-
-    const response = await fetch(finalUrl);
+    const response = await fetch(targetUrl);
 
     // Copy headers (important for content-type, caching, etc.)
     const headers = new Headers();
