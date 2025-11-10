@@ -14,7 +14,18 @@ export async function GET({ url }) {
   }
 
   try {
-    const response = await fetch(targetUrl);
+    // Check if its a reddit share url (because mobile) and handle accordingly
+    let finalUrl = targetUrl;
+    if (isShareUrl(targetUrl)) {
+      const realTarget = await handleShare(targetUrl);
+      if (realTarget) {
+        finalUrl = realTarget;
+      } else {
+        error(502, "Failed to resolve share URL");
+      }
+    }
+
+    const response = await fetch(finalUrl);
 
     // Copy headers (important for content-type, caching, etc.)
     const headers = new Headers();
