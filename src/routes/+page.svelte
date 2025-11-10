@@ -78,8 +78,12 @@
       if (post.url) {
         if (post.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
           items.push({ url: post.url, type: "image" });
-        } else if (post.media?.reddit_video && post.media?.reddit_video?.fallback_url) {
-          items.push({ url: post.media.reddit_video.fallback_url, type: "video" });
+        } else if (post.media?.reddit_video) {
+          // Use the DASH URL if available, fallback to fallback_url
+          const videoUrl = post.media.reddit_video.dash_url || post.media.reddit_video.fallback_url;
+          if (videoUrl) {
+            items.push({ url: videoUrl, type: "video" });
+          }
         }
       }
 

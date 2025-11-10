@@ -33,6 +33,7 @@ declare global {
       replies?: RedditListingResponse;
       media?: {
         reddit_video?: {
+          dash_url: string;
           fallback_url: string;
           height: number;
           width: number;
