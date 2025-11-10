@@ -7,16 +7,29 @@
 
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import Download from "@lucide/svelte/icons/download";
+  import { isShareUrl } from "$lib/utils";
 
   let inputError = $state("");
   let loading = $state(false);
   let mediaItems = $state<Array<{ url: string; type: "image" | "video" }>>([]);
   let downloadingItems = $state<Set<string>>(new Set());
 
+  async function handleShare(shareUrl: string): Promise<string | null> {
+    try {
+      const response = await fetch(shareUrl, { redirect: "manual" });
+      const location = response.headers.get("location");
+      console.log("Share URL redirected to:", location);
+      return location;
+    } catch (error) {
+      console.error("Error resolving share URL:", error);
+      return null;
+    }
+  }
+
   async function handleSubmit(e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const url = formData.get("url") as string;
+    let url = formData.get("url") as string;
     console.log("Submitted URL:", url);
 
     if (!url) {
@@ -27,6 +40,22 @@
 
     loading = true;
     inputError = "";
+
+    // Handle share URLs
+    if (isShareUrl(url)) {
+      console.log("Handling share URL:", url);
+      const resolvedUrlResponse = await fetch(`/api/get-original-url?url=${encodeURIComponent(url)}`);
+      const resolvedUrl = resolvedUrlResponse.ok ? await resolvedUrlResponse.text() : null;
+      console.log("Resolved share URL to:", url);
+
+      if (resolvedUrl) {
+        url = resolvedUrl;
+      } else {
+        inputError = "Failed to resolve share URL.";
+        loading = false;
+        return;
+      }
+    }
 
     // Sanitize reddit url
     const newUrl = new URL(url);
@@ -69,8 +98,9 @@
 
       mediaItems = items;
     } else {
+      const errorMessage = await response.text();
       console.error("Error fetching data:", response.statusText);
-      inputError = `Failed to fetch post data: ${response.statusText}`;
+      inputError = `Failed to fetch post data: ${errorMessage || response.statusText}`;
     }
     loading = false;
   }
