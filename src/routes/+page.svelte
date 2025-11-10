@@ -137,11 +137,11 @@
       <div class="flex flex-wrap gap-4">
         {#each mediaItems as item}
           <Card.Root class="flex max-w-sm flex-[1_1_150px] flex-col overflow-hidden">
-            <Card.Content class="p-0 max-h-64">
+            <Card.Content class="max-h-64 p-0">
               {#if item.type === "image"}
-                <img src={item.url} alt="Reddit media" class="h-full object-cover mx-auto" />
+                <img src={item.url} alt="Reddit media" class="mx-auto h-full object-cover" />
               {:else}
-                <video src={item.url} controls class="h-full object-cover mx-auto"><track kind="captions" /></video>
+                <video src={item.url} controls class="mx-auto h-full object-cover"><track kind="captions" /></video>
               {/if}
             </Card.Content>
             <Card.Footer class="mt-auto flex-row gap-2 p-2">
