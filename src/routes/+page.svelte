@@ -10,6 +10,7 @@
   import Download from "@lucide/svelte/icons/download";
   import { isShareUrl, sanitizeUrl } from "$lib/utils";
   import Spinner from "$lib/components/ui/spinner/spinner.svelte";
+  import { page } from "$app/state";
 
   let inputError = $state("");
   let loading = $state(false);
@@ -130,6 +131,25 @@
     }
   }
 </script>
+
+<svelte:head>
+  <title>EZ Reddit Downloader</title>
+  <meta name="description" content="Easily download images and videos from Reddit posts." />
+
+  <!-- OG Tags -->
+  <meta property="og:title" content="EZ Reddit Downloader" />
+  <meta property="og:description" content="Easily download images and videos from Reddit posts." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={page.url.toString()} />
+
+  <!-- Twitter Card Tags -->
+  <meta property="og:url" content={page.url.toString()} />
+  <!-- No summary large image since it mess up discord embeds -->
+  <meta property="twitter:card" content="summary" />
+
+  <!-- other -->
+  <meta name="theme-color" content="#1a202c" />
+</svelte:head>
 
 <!-- header -->
 <header class="flex h-fit w-full items-center justify-between rounded-lg border p-2">
