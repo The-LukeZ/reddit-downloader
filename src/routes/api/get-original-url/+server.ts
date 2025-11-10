@@ -1,3 +1,4 @@
+import { sanitizeUrl } from "$lib/utils";
 import { error } from "@sveltejs/kit";
 
 export async function GET({ url }) {
@@ -20,7 +21,7 @@ export async function GET({ url }) {
     console.log("Fetched URL:", shareUrl, "Redirect location:", location);
 
     if (location) {
-      return new Response(location, { status: 200 });
+      return new Response(sanitizeUrl(location), { status: 200 });
     } else {
       new Error("No redirect location found");
     }
