@@ -14,7 +14,15 @@ export async function GET({ url }) {
   }
 
   try {
-    const response = await fetch(targetUrl);
+    const response = await fetch(targetUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        Accept: "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/json; charset=UTF-8",
+        "Cache-Control": "public, max-age=86400",
+      },
+    });
 
     // Copy headers (important for content-type, caching, etc.)
     const headers = new Headers({
