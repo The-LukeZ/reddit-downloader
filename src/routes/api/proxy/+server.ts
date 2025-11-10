@@ -6,7 +6,11 @@ export async function GET({ url, request }) {
   }
 
   try {
-    new URL(targetUrl);
+    const url = new URL(targetUrl);
+    // Check if reddit url
+    if (!url.hostname.endsWith("reddit.com") && !url.hostname.endsWith("redd.it")) {
+      return new Response("Can only proxy reddit URLs", { status: 400 });
+    }
   } catch {
     return new Response("Invalid URL", { status: 400 });
   }
