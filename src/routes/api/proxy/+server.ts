@@ -17,7 +17,10 @@ export async function GET({ url }) {
     const response = await fetch(targetUrl);
 
     // Copy headers (important for content-type, caching, etc.)
-    const headers = new Headers();
+    const headers = new Headers({
+      "Content-Type": "text/html; charset=UTF-8",
+      "Cache-Control": "public, max-age=86400",
+    });
     for (const [key, value] of response.headers) {
       // Strip headers that would break the response
       if (!["transfer-encoding", "connection", "content-length", "content-encoding"].includes(key.toLowerCase())) {

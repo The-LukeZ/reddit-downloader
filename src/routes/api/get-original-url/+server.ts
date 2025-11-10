@@ -21,7 +21,13 @@ export async function GET({ url }) {
     console.log("Fetched URL:", shareUrl, "Redirect location:", location);
 
     if (location) {
-      return new Response(sanitizeUrl(location), { status: 200 });
+      return new Response(sanitizeUrl(location), {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=UTF-8",
+          "Cache-Control": "public, max-age=86400",
+        },
+      });
     } else {
       new Error("No redirect location found");
     }
