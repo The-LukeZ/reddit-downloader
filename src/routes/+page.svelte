@@ -150,7 +150,13 @@
           <Progress class="mb-4" value={progress} />
         {/if}
 
-        <Input id="url" name="url" autocomplete="off" placeholder="https://www.reddit.com/r/madlads/comments/1otakuo" />
+        <Input
+          type="url"
+          id="url"
+          name="url"
+          autocomplete="off"
+          placeholder="https://www.reddit.com/r/madlads/comments/1otakuo"
+        />
         {#if inputError}
           <p class="mt-2 text-sm text-destructive">{inputError}</p>
         {/if}
