@@ -1,30 +1,21 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import { Progress } from "$lib/components/ui/progress/index.js";
 
   import ModeToggle from "$lib/components/ModeToggle.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
 
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import Download from "@lucide/svelte/icons/download";
-  import { isShareUrl } from "$lib/utils";
+  import { isShareUrl, sanitizeUrl } from "$lib/utils";
+  import Spinner from "$lib/components/ui/spinner/spinner.svelte";
 
   let inputError = $state("");
   let loading = $state(false);
+  let progress = $state(0);
   let mediaItems = $state<Array<{ url: string; type: "image" | "video" }>>([]);
   let downloadingItems = $state<Set<string>>(new Set());
-
-  async function handleShare(shareUrl: string): Promise<string | null> {
-    try {
-      const response = await fetch(shareUrl, { redirect: "manual" });
-      const location = response.headers.get("location");
-      console.log("Share URL redirected to:", location);
-      return location;
-    } catch (error) {
-      console.error("Error resolving share URL:", error);
-      return null;
-    }
-  }
 
   async function handleSubmit(e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
     e.preventDefault();
@@ -38,18 +29,23 @@
       return;
     }
 
+    progress = 10;
+
+    url = sanitizeUrl(url);
+
     loading = true;
     inputError = "";
 
     // Handle share URLs
     if (isShareUrl(url)) {
       console.log("Handling share URL:", url);
+      progress = 40;
       const resolvedUrlResponse = await fetch(`/api/get-original-url?url=${encodeURIComponent(url)}`);
       const resolvedUrl = resolvedUrlResponse.ok ? await resolvedUrlResponse.text() : null;
       console.log("Resolved share URL to:", url);
 
       if (resolvedUrl) {
-        url = resolvedUrl;
+        url = sanitizeUrl(resolvedUrl);
       } else {
         inputError = "Failed to resolve share URL.";
         loading = false;
@@ -57,10 +53,10 @@
       }
     }
 
+    progress = 60;
+
     // Sanitize reddit url
-    const newUrl = new URL(url);
-    const strippedUrl = newUrl.protocol + "//" + newUrl.host + newUrl.pathname;
-    const jsonUrl = strippedUrl.replace(/\/+$/, "") + ".json";
+    const jsonUrl = url.replace(/\/+$/, "") + ".json";
     console.log("Fetching JSON URL:", jsonUrl);
 
     // Get posts via api proxy route /api/proxy?url=
@@ -103,6 +99,7 @@
       inputError = `Failed to fetch post data: ${errorMessage || response.statusText}`;
     }
     loading = false;
+    progress = 0;
   }
 
   async function downloadMedia(url: string, type: "image" | "video") {
@@ -149,13 +146,23 @@
         <Card.Description>Enter the URL of the Reddit post you want to download media from.</Card.Description>
       </Card.Header>
       <Card.Content>
+        {#if progress > 0 && progress < 100}
+          <Progress class="mb-4" value={progress} />
+        {/if}
+
         <Input id="url" name="url" autocomplete="off" placeholder="https://www.reddit.com/r/madlads/comments/1otakuo" />
         {#if inputError}
           <p class="mt-2 text-sm text-destructive">{inputError}</p>
         {/if}
       </Card.Content>
       <Card.Footer>
-        <Button type="submit" class="w-full" disabled={loading}>Fetch Post</Button>
+        <Button type="submit" class="w-full" disabled={loading}>
+          {#if loading}
+            <Spinner />
+          {:else}
+            Fetch Post
+          {/if}
+        </Button>
       </Card.Footer>
     </Card.Root>
   </form>
